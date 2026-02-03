@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 
 	config "marryo/Config"
 	controller "marryo/Internal/Controllers"
@@ -20,6 +21,11 @@ func main(){
 	
 	if err := config.InitRedis(); err != nil {
 		log.Fatal("Redis connection failed:", err)
+	}
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("env file not found, using system environment variables")
 	}
 
 	app := fiber.New()
