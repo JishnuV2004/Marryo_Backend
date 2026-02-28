@@ -16,6 +16,7 @@ var (
 func InitRedis() error {
 	redisURL := os.Getenv("REDIS_URL")
 	if redisURL == "" {
+		log.Println("DEBUG REDIS_URL:", redisURL)
 		log.Fatal("REDIS_URL not set")
 	}
 
