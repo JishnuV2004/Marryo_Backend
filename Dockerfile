@@ -34,9 +34,6 @@ COPY --from=builder /app/app .
 # Copy Web templates (important for your SSR admin panel)
 COPY --from=builder /app/Web ./Web
 
-# Copy firebase credentials if needed
-COPY --from=builder /app/Config/firebase-service-account.json ./Config/firebase-service-account.json
-
 # Expose port
 EXPOSE 8080
 
