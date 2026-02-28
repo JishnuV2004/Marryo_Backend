@@ -1,7 +1,7 @@
 package dto
 
 type SearchFilterRequest struct {
-	LookingFor   string   `json:"lookingFor"`
+	// LookingFor   string   `json:"lookingFor"`
 	MaritalStatus string  `json:"maritalStatus"`
 	Religion     string   `json:"religion"`
 	Caste        []string `json:"caste"`
@@ -16,3 +16,4 @@ type SearchFilterRequest struct {
 	State        string   `json:"state"`
 	City         string   `json:"city"`
 }
+

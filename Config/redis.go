@@ -2,6 +2,8 @@ package config
 
 import (
 	"context"
+	"os"
+
 	"github.com/redis/go-redis/v9"
 )
 
@@ -12,7 +14,7 @@ var (
 
 func InitRedis() error {
 	Redis = redis.NewClient(&redis.Options{
-		Addr: "127.0.0.1:6379", // force IPv4
+		Addr: os.Getenv("REDIS_ADDR"), // force IPv4
 	})
 
 	// test connection

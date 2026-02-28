@@ -30,3 +30,4 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+Config/firebase-service-account.json

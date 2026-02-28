@@ -25,7 +25,7 @@ func NewAuthService(repo repositories.Repository, redis *redis.Client) *AuthServ
 	return &AuthService{repo: repo, redis: redis}
 }
 
-//Signup
+// Signup
 func (s *AuthService) Signup(u *dto.RegisterRequest) (interface{}, error) {
 
 	var existing models.User
@@ -46,7 +46,7 @@ func (s *AuthService) Signup(u *dto.RegisterRequest) (interface{}, error) {
 	// 	IsVerified: false,
 	// }
 
-	s.redis.HSet(config.Ctx, "signup:"+u.Email, map[string]interface{}{ "email":    u.Email, "password": hashed,},)
+	s.redis.HSet(config.Ctx, "signup:"+u.Email, map[string]interface{}{"email": u.Email, "password": hashed})
 
 	s.redis.Expire(config.Ctx, "signup:"+u.Email, 10*time.Minute)
 
@@ -64,7 +64,7 @@ func (s *AuthService) Signup(u *dto.RegisterRequest) (interface{}, error) {
 
 }
 
-//Verifiy OTP
+// Verifiy OTP
 func (s *AuthService) VerifiyOTP(email, otp string) error {
 
 	stroedOTP, err := s.redis.Get(config.Ctx, "otp:"+email).Result()
@@ -78,8 +78,8 @@ func (s *AuthService) VerifiyOTP(email, otp string) error {
 	}
 
 	user := models.User{
-		Email: data["email"],
-		Password: data["password"],
+		Email:      data["email"],
+		Password:   data["password"],
 		IsVerified: true,
 	}
 	if err := s.repo.Create(&user); err != nil {
@@ -93,7 +93,7 @@ func (s *AuthService) VerifiyOTP(email, otp string) error {
 }
 
 // CompleteSignup
-func (s *AuthService) CompleteSignup(u *dto.RegisterRequest) ( error) {
+func (s *AuthService) CompleteSignup(u *dto.RegisterRequest) error {
 
 	var user models.User
 
@@ -110,56 +110,67 @@ func (s *AuthService) CompleteSignup(u *dto.RegisterRequest) ( error) {
 		fmt.Sprintf("%s-%s-%s", u.DobYear, u.DobMonth, u.DobDay),
 	)
 
-		profile := models.Profile{
-			UserID: user.ID,
-			FullName: u.Name,
-			DOB: dob,
-			MotherTongue: u.MotherTongue,
+	profile := models.Profile{
+		UserID:       user.ID,
+		FullName:     u.Name,
+		DOB:          dob,
+		MotherTongue: u.MotherTongue,
 
-			Gender: u.Gender,
-			Height: u.Height,
-			PhysicalStatus: u.PhysicalStatus,
-			MaritalStatus:  u.MaritalStatus,
-			Religion:       u.Religion,
+		Gender:         u.Gender,
+		Height:         u.Height,
+		PhysicalStatus: u.PhysicalStatus,
+		MaritalStatus:  u.MaritalStatus,
+		Religion:       u.Religion,
 
-			Country:      u.Country,
-			Employment:   u.Employment,
-			Occupation:   u.Occupation,
-			AnnualIncome: u.AnnualIncome,
+		Country:      u.Country,
+		Employment:   u.Employment,
+		Occupation:   u.Occupation,
+		AnnualIncome: u.AnnualIncome,
 
-			Star:  u.Star,
-			Raasi: u.Raasi,
+		Star:  u.Star,
+		Raasi: u.Raasi,
 
-			Education:    u.Education,
-			College:      u.College,
-			Organization: u.Organization,
+		Education:    u.Education,
+		College:      u.College,
+		Organization: u.Organization,
 
-			EatingHabit: u.EatingHabit,
+		EatingHabit:      u.EatingHabit,
+		ProfileCompleted: true,
+	}
 
-			ProfileCompleted: true,
+	if u.PhotoUrl != "" {
+		profile.Images = []models.Img{
+			{
+				URL:        u.PhotoUrl,
+				IsPrimary:  true,
+				IsApproved: true,
+			},
 		}
-		err = s.repo.Create(&profile)
-		return err
+	}
+
+	err = s.repo.Create(&profile)
+	return err
 }
 
 // Login
-func (s *AuthService) Login(data *dto.LoginRequest) (*models.User, string, string, error) {
+func (s *AuthService) Login(data *dto.LoginRequest) (*models.User, string, string,*models.Role, error) {
 	var user models.User
 	err := s.repo.FindOne(&user, "email = ?", data.Email)
 	if err != nil {
-		return nil, "", "", errors.New("user not found")
+		return nil, "", "",nil,errors.New("user not found")
 	}
 
 	if err := utils.Comparepassword(user.Password, data.Password); err != nil {
-		return nil, "", "", errors.New("invalid password")
+		return nil, "", "", nil,errors.New("invalid password")
 	}
 
-	access, _ := utils.GenerateAccess(user.ID)
-	refresh, _ := utils.GenerateRefresh(user.ID)
+	access, _ := utils.GenerateAccess(user.ID, user.Role)
+	refresh, _ := utils.GenerateRefresh(user.ID, user.Role)
 
 	s.redis.Set(config.Ctx, "refresh"+refresh, user.ID, 7*24*time.Hour)
+	rolePermission,_:=s.repo.GetPermissionsByRole(user.Role)
 
-	return &user, access, refresh, nil
+	return &user, access, refresh,rolePermission, nil
 }
 
 // Refresh Func
@@ -170,14 +181,18 @@ func (s *AuthService) Refresh(oldRefresh string) (string, string, error) {
 		return "", "", errors.New("invalid or expired refresh token")
 	}
 
-	userID := uint(id)
+	var user models.User
+	err = s.repo.FindOne(&user, "user_id = ?", id)
+	if err != nil {
+		return "", "", errors.New("refresh user notfound")
+	}
 
 	s.redis.Del(config.Ctx, "refresh"+oldRefresh)
 
-	newAccess, _ := utils.GenerateAccess(userID)
-	newRefresh, _ := utils.GenerateRefresh(userID)
+	newAccess, _ := utils.GenerateAccess(user.ID, user.Role)
+	newRefresh, _ := utils.GenerateRefresh(user.ID, user.Role)
 
-	s.redis.Set(config.Ctx, "refresh"+newRefresh, userID, 7*24*time.Hour)
+	s.redis.Set(config.Ctx, "refresh"+newRefresh, user.ID, 7*24*time.Hour)
 
 	return newAccess, newRefresh, nil
 }
@@ -188,13 +203,27 @@ func (s *AuthService) Logout(access, refresh string) {
 	s.redis.Set(config.Ctx, "blacklist:"+access, "1", 15*time.Minute)
 }
 
-//Profile
-// func (s *AuthService) Profile(email string) (*models.User, error) {
-// 	var user models.User
-// 	err := s.repo.FindOne(&user, "email = ?", email)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+///////// RBAC //////////
 
-// 	return &user, nil
-// }
+func (s *AuthService) GetUserPermissions(userID uint) ([]string, error) {
+
+	user, err := s.repo.GetUserWithRoles(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	permissionMap := make(map[string]bool)
+
+	for _, role := range user.Roles {
+		for _, p := range role.Permissions {
+			permissionMap[p.Name] = true
+		}
+	}
+
+	var permissions []string
+	for key := range permissionMap {
+		permissions = append(permissions, key)
+	}
+
+	return permissions, nil
+}

@@ -119,10 +119,13 @@ func (s *AuthController) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	user, access, refresh, err := s.Service.Login(&req)
+	_, access, refresh,roles, err := s.Service.Login(&req)
 
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": err.Error()})
+		errormsg := utils.ErrorMessage(400, err)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": errormsg,
+		})
 	}
 
 	c.Cookie(&fiber.Cookie{
@@ -144,14 +147,9 @@ func (s *AuthController) Login(c *fiber.Ctx) error {
 		MaxAge:   60 * 60 * 24 * 7, // 7 days
 	})
 
-	return c.JSON(fiber.Map{
-		"message": "login successful",
-		"user": fiber.Map{
-			"id":       user.ID,
-			"email":    user.Email,
-			// "username": user.Username,
-			"access":   access,
-		},
+	success := utils.SuccessResponse(roles)
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"message":success,
 	})
 
 }
@@ -183,20 +181,3 @@ func (s *AuthController) Logout(c *fiber.Ctx) error {
 	})
 }
 
-//Profile
-// func (s *AuthController) Profile(c *fiber.Ctx) error {
-// 	email := c.Locals("email").(string)
-
-// 	user, err :=s.Service.Profile(email)
-// 	if err != nil {
-// 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-// 			"error": err.Error(),
-// 			"err" : "profile not showing",
-// 		})
-// 	}
-
-// 	return c.Status(200).JSON(fiber.Map{
-// 		"username" : user.Username,
-// 		"email" : user.Email,
-// 	})
-// }

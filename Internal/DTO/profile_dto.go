@@ -1,8 +1,8 @@
-package  dto
+package dto
 
 type RegisterRequest struct {
-	Email        string `json:"email"`
-	Password     string `json:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 
 	Name         string `json:"name"`
 	DobDay       string `json:"dobDay"`
@@ -29,4 +29,5 @@ type RegisterRequest struct {
 	Organization string `json:"organization"`
 
 	EatingHabit string `json:"eatingHabit"`
+	PhotoUrl    string `json:"photo"`
 }

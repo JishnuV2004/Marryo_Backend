@@ -17,6 +17,7 @@ func SendOTPEmail(to, otp string) error {
 
 	from := os.Getenv("E_MAIL")
 	password := os.Getenv("APP_PASS")
+	
 
 	msg := []byte(
 		"Subject: Marryo Email Verification\n\n" +

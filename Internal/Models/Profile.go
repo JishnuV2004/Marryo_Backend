@@ -42,6 +42,8 @@ type Profile struct {
 	// Step 6: Lifestyle
 	EatingHabit string `gorm:"size:50"`
 
+	Images []Img `gorm:"constraint:OnDelete:CASCADE;"`
+
 	// Meta
 	ProfileCompleted bool `gorm:"default:false"`
 }

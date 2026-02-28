@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    container_name: go_backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      PORT: 8080
+      DATABASE_URL: postgres://postgres:jishnu@2004@postgres:5432/marryo?sslmode=disable
+      REDIS_ADDR: redis:6379
+      REDIS_HOST: redis
+      JWT_SECRET: supersecret
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: jishnu@2004
+      POSTGRES_DB: marryo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache
+    restart: always
+
+volumes:
+  postgres_data:

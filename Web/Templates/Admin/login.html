@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login - Marryo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-[#FFF5F7] flex items-center justify-center p-6 lg:p-12 relative overflow-hidden">
+
+    <!-- Decorative Background -->
+    <div class="absolute top-[-10%] left-[-5%] w-96 h-96 bg-pink-200/40 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-[-10%] right-[-5%] w-80 h-80 bg-rose-200/40 rounded-full blur-3xl"></div>
+
+    <div class="w-full max-w-5xl flex flex-col lg:flex-row bg-white rounded-[3rem] shadow-2xl overflow-hidden relative z-10">
+
+        <!-- Left Side -->
+        <div class="lg:w-1/2 bg-gradient-to-br from-pink-500 to-rose-600 p-12 text-white flex flex-col justify-between">
+            <div>
+                <h1 class="text-2xl font-black uppercase tracking-[0.2em] mb-10">Marryo</h1>
+                <h2 class="text-4xl font-black leading-tight mb-6">
+                    Manage the World's Most Beautiful Bonds.
+                </h2>
+                <p class="text-white/80 font-medium">
+                    The definitive admin portal for matchmaking excellence.
+                </p>
+            </div>
+
+            <div class="mt-10 bg-white/10 p-4 rounded-3xl border border-white/20">
+                <p class="font-bold">Secure Access</p>
+                <p class="text-xs text-white/70 italic">SSL Encrypted Portal</p>
+            </div>
+        </div>
+
+        <!-- Right Side Form -->
+        <div class="lg:w-1/2 p-12 lg:p-20 bg-white flex flex-col justify-center">
+
+            <div class="mb-10">
+                <h3 class="text-3xl font-black text-slate-900 mb-2">Welcome Back</h3>
+                <p class="text-slate-500 text-sm italic">
+                    Please enter your credentials to access the console
+                </p>
+            </div>
+
+            <!-- ERROR MESSAGE -->
+            {{if .Error}}
+            <div class="mb-6 text-red-500 font-bold text-sm">
+                {{.Error}}
+            </div>
+            {{end}}
+
+            <!-- FORM -->
+            <form method="POST" action="/admin/login" class="space-y-6">
+
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase">
+                        Email Address
+                    </label>
+                    <input
+                        type="email"
+                        name="email"
+                        required
+                        class="w-full mt-2 px-4 py-3 border rounded-2xl focus:outline-none focus:border-pink-500"
+                        placeholder="admin@marryo.com"
+                    />
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase">
+                        Password
+                    </label>
+                    <input
+                        type="password"
+                        name="password"
+                        required
+                        class="w-full mt-2 px-4 py-3 border rounded-2xl focus:outline-none focus:border-pink-500"
+                        placeholder="••••••••"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-pink-500 hover:bg-pink-600 text-white py-4 rounded-2xl font-black uppercase tracking-wider transition"
+                >
+                    Authorize Entry
+                </button>
+
+            </form>
+
+            <p class="mt-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">
+                Protected by Marryo Security Protocol
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
