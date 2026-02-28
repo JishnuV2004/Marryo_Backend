@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"github.com/redis/go-redis/v9"
@@ -13,11 +14,24 @@ var (
 )
 
 func InitRedis() error {
-	Redis = redis.NewClient(&redis.Options{
-		Addr: os.Getenv("REDIS_ADDR"), // force IPv4
-	})
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL == "" {
+		log.Fatal("REDIS_URL not set")
+	}
 
-	// test connection
-	_, err := Redis.Ping(Ctx).Result()
-	return err
+	opt, err := redis.ParseURL(redisURL)
+	if err != nil {
+		log.Fatal("Invalid REDIS_URL:", err)
+	}
+
+	Redis = redis.NewClient(opt)
+
+	// Test connection
+	_, err = Redis.Ping(Ctx).Result()
+	if err != nil {
+		return err
+	}
+
+	log.Println("✅ Redis connected successfully")
+	return nil
 }
