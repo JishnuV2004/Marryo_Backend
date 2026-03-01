@@ -6,19 +6,23 @@ import (
 
 	"os"
 
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 )
 
 func SendOTPEmail(to, otp string) error {
 
-	if err := godotenv.Load(".././.env"); err != nil {
-		log.Println("No .env file found",err)
-	}
+	// if err := godotenv.Load(".././.env"); err != nil {
+	// 	log.Println("No .env file found",err)
+	// }
 
 	from := os.Getenv("E_MAIL")
 	password := os.Getenv("APP_PASS")
-	
 
+	if from == "" || password == "" {
+		log.Println("SMTP credentials not set")
+		return nil
+	}
+	
 	msg := []byte(
 		"Subject: Marryo Email Verification\n\n" +
 			"Your OTP is: " + otp + "\n\n" +
