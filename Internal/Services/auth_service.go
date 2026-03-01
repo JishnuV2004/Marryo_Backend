@@ -53,7 +53,7 @@ func (s *AuthService) Signup(u *dto.RegisterRequest) (interface{}, error) {
 	s.redis.Set(config.Ctx, "otp:"+u.Email, otp, 5*time.Minute)
 
 	if err := utils.SendOTPEmail(u.Email, otp); err != nil {
-		return nil, errors.New("failed to send OTP email")
+		return nil, errors.New(err.Error())
 	}
 
 	fmt.Println("OTP:", otp)
