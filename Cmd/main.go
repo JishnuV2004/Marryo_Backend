@@ -59,11 +59,7 @@ func main() {
 	app.Static("/static", "./Web/Static")
 
 	storage := redisStorage.New(redisStorage.Config{
-    Host:     os.Getenv("REDIS_URL"),
-    Port:     6379,
-    Username: "",
-    Password: "",
-    Database: 0,
+    URL: os.Getenv("REDIS_URL"),
 })
 
 	// Session Store
