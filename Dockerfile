@@ -34,6 +34,8 @@ COPY --from=builder /app/app .
 # Copy Web templates (important for your SSR admin panel)
 COPY --from=builder /app/Web ./Web
 
+COPY --from=builder /app/Config ./Config
+
 # Expose port
 EXPOSE 8080
 

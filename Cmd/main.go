@@ -50,7 +50,7 @@ func main() {
 	config.InitDB()
 
 	// HTML Engine
-	engine := html.New("../Web/Templates", ".html")
+	engine := html.New("/Web/Templates", ".html")
 
 	app := fiber.New(fiber.Config{
 		Views: engine,
