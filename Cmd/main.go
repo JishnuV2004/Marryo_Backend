@@ -50,7 +50,7 @@ func main() {
 	config.InitDB()
 
 	// HTML Engine
-	engine := html.New("/Web/Templates", ".html")
+	engine := html.New("Web/Templates", ".html")
 
 	app := fiber.New(fiber.Config{
 		Views: engine,
@@ -59,7 +59,7 @@ func main() {
 	app.Static("/static", "./Web/Static")
 
 	storage := redisStorage.New(redisStorage.Config{
-    Host:     os.Getenv("REDIS_HOST"),
+    Host:     os.Getenv("REDIS_URL"),
     Port:     6379,
     Username: "",
     Password: "",
