@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"time"
 
@@ -39,6 +40,7 @@ func (s *AuthService) Signup(u *dto.RegisterRequest) (interface{}, error) {
 	}
 
 	otp := utils.GenerateOTP()
+	log.Println("otp :", otp)
 
 	// user := models.User{
 	// 	Email:      u.Email,
